@@ -1,0 +1,28 @@
+#compdef skate skget
+
+_skate_keys() {
+    local -a keys
+    keys=("${(@f)$(_call_program keys skate list -k 2>/dev/null)}")
+    _describe 'skate keys' keys
+}
+
+if [[ $service == "skget" ]]; then
+    # For skget, we ONLY want keys, and we want them at the first argument
+    _arguments '1: :_skate_keys'
+else
+    # For the standard skate command, keep the subcommand logic
+    _arguments \
+      '1: :->command' \
+      '2: :->key'
+
+    case $state in
+      command)
+        local -a subcmds
+        subcmds=(get set delete list)
+        _describe 'command' subcmds
+        ;;
+      key)
+        _skate_keys
+        ;;
+    esac
+fi
